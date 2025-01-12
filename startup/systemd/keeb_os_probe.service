@@ -2,6 +2,6 @@
 Description=Run host OS keyboard probe
 [Service]
 Type=oneshot
-ExecStart=/usr/local/keeb_os_probe
+ExecStart=/usr/local/bin/keeb_os_probe
 [Install]
 WantedBy=multi-user.target
