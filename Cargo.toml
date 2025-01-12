@@ -1,0 +1,11 @@
+[package]
+name = "keeb_os_probe"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+anyhow = "1.0.95"
+dirs = "6.0.0"
+hidapi = "2.6.3"
+serde = { version = "1.0.217", features = ["derive"] }
+toml = "0.8.19"
