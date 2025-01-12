@@ -28,7 +28,8 @@ struct KeyboardConfig {
 pub fn main() -> anyhow::Result<()> {
     let mut config_path = dirs::config_local_dir().context("Could not find config path")?;
     config_path.push("keeb_os_probe.toml");
-    let config_toml = fs::read_to_string(config_path)?;
+    let config_toml =
+        fs::read_to_string(&config_path).context(format!("Config path: {:?}", &config_path))?;
     let config: Config = toml::from_str(&config_toml)?;
     let board_connection = BoardConnection::new(&config)?;
     board_connection.probe()
