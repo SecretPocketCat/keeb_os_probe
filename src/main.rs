@@ -31,11 +31,21 @@ pub fn main() -> anyhow::Result<()> {
     let config_toml =
         fs::read_to_string(&config_path).context(format!("Config path: {:?}", &config_path))?;
     let config: Config = toml::from_str(&config_toml)?;
-    let board_connection = BoardConnection::new(config)?;
+    if config.keyboards.is_empty() {
+        anyhow::bail!("No boards configured");
+    }
     let context = rusb::Context::new()?;
-    let _reg = rusb::HotplugBuilder::new()
+    let mut hotplug = rusb::HotplugBuilder::new();
+    if config.keyboards.len() == 1 {
+        // limit hotplug to the single device vendor & product IDs
+        let (_, keeb_conf) = &config.keyboards.iter().next().unwrap();
+        hotplug
+            .vendor_id(keeb_conf.vendor_id)
+            .product_id(keeb_conf.product_id);
+    }
+    let _reg = hotplug
         .enumerate(true)
-        .register::<rusb::Context, _>(&context, Box::new(board_connection))?;
+        .register::<rusb::Context, _>(&context, Box::new(BoardConnection::new(config)?))?;
     loop {
         context.handle_events(None)?;
     }
