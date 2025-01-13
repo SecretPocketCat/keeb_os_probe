@@ -22,9 +22,16 @@ struct KeyboardConfig {
     product_id: u16,
 }
 
+/// [QMK OS enum](https://github.com/qmk/qmk_firmware/blob/26f898c8a538b808cf506f558a9454f7f50e3ba6/quantum/os_detection.h#L23)
+#[cfg(target_os = "linux")]
+const HOST_OS_CODE: u8 = 1;
+#[cfg(target_os = "windows")]
+const HOST_OS_CODE: u8 = 2;
+#[cfg(target_os = "macos")]
+const HOST_OS_CODE: u8 = 3;
+
 /// Try to connect to the configured HID device(s)
-/// and send HID messages to trigger the USB host detection
-/// wizardry for each connected board
+/// and send HID messages passing the current host OS code
 pub fn main() -> anyhow::Result<()> {
     let mut config_path = dirs::config_local_dir().context("Could not find config path")?;
     config_path.push("keeb_os_probe.toml");
@@ -62,8 +69,8 @@ impl<'a> BoardConnection<'a> {
             device.write(&[
                 0, // report ID - mandatory
                 // the actual payload starts here, limited to 32 bytes in QMK (or by HID in general?)
-                42, // rerun host detection
-                   // could send actual OS here too, but the detection works reasonably well for now, so to avoid having to maintain a list of hosts based on QMK and just having less keeb code it relies on the QMK-provided host detection
+                42, // reporting host
+                HOST_OS_CODE,
             ])?;
         }
         Ok(())
