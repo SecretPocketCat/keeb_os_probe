@@ -4,4 +4,4 @@ Description=Run host OS keyboard probe
 Type=oneshot
 ExecStart=/usr/local/bin/keeb_os_probe
 [Install]
-WantedBy=multi-user.target
+WantedBy=default.target
